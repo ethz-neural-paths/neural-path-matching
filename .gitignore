@@ -1,7 +1,12 @@
+# Datasets and results
 data/*
 !/data/download.sh
 experiments/*
 !.gitkeep
+
+# PyCharm
+.idea
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
