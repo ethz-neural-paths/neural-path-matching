@@ -195,16 +195,15 @@ class VGG16FlowSearch():
         best_shift = np.zeros((im1.shape[0], im1.shape[1], 2))
         best_umax = np.zeros(im1.shape[:2])
 
-        with self.sess as sess:
-            v = sess.run(self.values1 + self.values2, feed_dict={self.input1: im1, self.input2: im2})
-            for i in range(d_range[0][0], d_range[0][1], step[0]):
-                for j in range(d_range[1][0], d_range[1][1], step[1]):
-                    print('Currently processing:', (i, j))
-                    f_dict = {a: b for a, b in
-                              zip(self.values1 + self.values2 + [self.d_range], v + [np.array([[i, i + step[0]], [j, j + step[1]]])])}
-                    curr_shift, umax = sess.run([self.shift, self.U_max], feed_dict=f_dict)
-                    best_shift = np.where(np.expand_dims(umax > best_umax, -1), curr_shift, best_shift)
-                    best_umax = np.maximum(umax, best_umax)
+        v = self.sess.run(self.values1 + self.values2, feed_dict={self.input1: im1, self.input2: im2})
+        for i in range(d_range[0][0], d_range[0][1], step[0]):
+            for j in range(d_range[1][0], d_range[1][1], step[1]):
+                print('Currently processing:', (i, j))
+                f_dict = {a: b for a, b in
+                          zip(self.values1 + self.values2 + [self.d_range], v + [np.array([[i, i + step[0]], [j, j + step[1]]])])}
+                curr_shift, umax = self.sess.run([self.shift, self.U_max], feed_dict=f_dict)
+                best_shift = np.where(np.expand_dims(umax > best_umax, -1), curr_shift, best_shift)
+                best_umax = np.maximum(umax, best_umax)
 
         return best_shift
 
