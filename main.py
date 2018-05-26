@@ -1,4 +1,4 @@
-import os, sys, random
+import os, time
 import tensorflow as tf
 import numpy as np
 from skimage.io import imshow, imread
@@ -19,6 +19,8 @@ tf.flags.DEFINE_integer('xmin', -64, 'Disparity range minimum in x-Direction')
 tf.flags.DEFINE_integer('xmax', 64, 'Disparity range maximum in x-Direction')
 tf.flags.DEFINE_integer('ystep', 16, 'Disparity block size in y-Direction')
 tf.flags.DEFINE_integer('xstep', 16, 'Disparity block size in x-Direction')
+tf.flags.DEFINE_string('experiment_name', str(int(time.time())), 'Name of the sub-directory to store results in')
+tf.flags.DEFINE_boolean('plot', False, 'Plot the results on screen')
 
 
 def cart2pol(x, y):
@@ -38,27 +40,38 @@ def main(_):
             print("{}: {}".format(k.upper(), v.value))
         print("")
 
+    result_dir = os.path.join(root, 'experiments', FLAGS.experiment_name)
+    if not os.path.exists(result_dir):
+        os.makedirs(result_dir)
+
     model = VGG16FlowSearch()
     im1 = imread(os.path.join(root, FLAGS.image1))
     im2 = imread(os.path.join(root, FLAGS.image2))
     flow = model.infer(im1, im2, d_range=[[FLAGS.ymin,FLAGS.ymax],[FLAGS.xmin,FLAGS.xmax]],
                        step=[FLAGS.ystep,FLAGS.xstep])
 
-    plt.figure(figsize=(26, 6))
-    plt.subplot(1, 2, 1)
-    plt.imshow(im1)
-    plt.subplot(1, 2, 2)
-    plt.imshow(im2)
+    if FLAGS.plot:
+        plt.figure(figsize=(26, 6))
+        plt.subplot(1, 2, 1)
+        plt.imshow(im1)
+        plt.subplot(1, 2, 2)
+        plt.imshow(im2)
 
-    plt.figure(figsize=(16, 6))
-    plt.imshow(vis_flow(flow))
+        plt.figure(figsize=(16, 6))
+        plt.imshow(vis_flow(flow))
 
-    plt.figure(figsize=(16, 6))
-    plt.imshow(flow[:, :, 0], cmap='plasma')
-    plt.colorbar()
-    plt.figure(figsize=(16, 6))
-    plt.imshow(flow[:, :, 1], cmap='plasma')
-    plt.colorbar()
+        plt.figure(figsize=(16, 6))
+        plt.imshow(flow[:, :, 0], cmap='plasma')
+        plt.colorbar()
+        plt.figure(figsize=(16, 6))
+        plt.imshow(flow[:, :, 1], cmap='plasma')
+        plt.colorbar()
+
+    with open(os.path.join(result_dir, 'flow.flo'), 'wb') as f:
+        f.write('PIEH'.encode('ascii'))
+        h,w,d = flow.shape
+        np.array([w, h]).astype(np.int32).tofile(f)
+        np.reshape(flow, -1).astype(np.float32).tofile(f)
 
 if __name__ == '__main__':
     tf.app.run()
