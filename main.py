@@ -47,7 +47,7 @@ def main(_):
     model = VGG16FlowSearch()
     im1 = imread(os.path.join(root, FLAGS.image1))
     im2 = imread(os.path.join(root, FLAGS.image2))
-    flow = model.infer(im1, im2, d_range=[[FLAGS.ymin,FLAGS.ymax],[FLAGS.xmin,FLAGS.xmax]],
+    flow = -1 * model.infer(im1, im2, d_range=[[FLAGS.ymin,FLAGS.ymax],[FLAGS.xmin,FLAGS.xmax]],
                        step=[FLAGS.ystep,FLAGS.xstep])
 
     if FLAGS.plot:
@@ -71,7 +71,8 @@ def main(_):
         f.write('PIEH'.encode('ascii'))
         h,w,d = flow.shape
         np.array([w, h]).astype(np.int32).tofile(f)
-        np.reshape(flow, -1).astype(np.float32).tofile(f)
+        # Format flow for .flo file extension
+        np.reshape(flow[:,:,::-1], -1).astype(np.float32).tofile(f)
 
 if __name__ == '__main__':
     tf.app.run()
