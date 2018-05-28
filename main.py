@@ -9,16 +9,25 @@ from models.VGG16FlowSearch import VGG16FlowSearch
 
 root = os.path.dirname(os.path.realpath(__file__))
 
-# Config
+##########
+# Config #
+##########
+
 tf.flags.DEFINE_boolean('debug', False, 'Debug mode')
+
+# Images to process
 tf.flags.DEFINE_string('image1', 'data/training/image_2/000055_10.png', 'Image 1')
 tf.flags.DEFINE_string('image2', 'data/training/image_2/000055_11.png', 'Image 2')
-tf.flags.DEFINE_integer('ymin', -64, 'Disparity range minimum in y-Direction')
-tf.flags.DEFINE_integer('ymax', 64, 'Disparity range maximum in y-Direction')
-tf.flags.DEFINE_integer('xmin', -64, 'Disparity range minimum in x-Direction')
-tf.flags.DEFINE_integer('xmax', 64, 'Disparity range maximum in x-Direction')
-tf.flags.DEFINE_integer('ystep', 16, 'Disparity block size in y-Direction')
-tf.flags.DEFINE_integer('xstep', 16, 'Disparity block size in x-Direction')
+
+# Ranges and step sizes
+# (Defaults work for KITTI dataset)
+tf.flags.DEFINE_integer('ymin', -88, 'Disparity range minimum in y-Direction')
+tf.flags.DEFINE_integer('ymax', 52, 'Disparity range maximum in y-Direction')
+tf.flags.DEFINE_integer('xmin', -244, 'Disparity range minimum in x-Direction')
+tf.flags.DEFINE_integer('xmax', 192, 'Disparity range maximum in x-Direction')
+tf.flags.DEFINE_integer('ystep', 4, 'Disparity block size in y-Direction')
+tf.flags.DEFINE_integer('xstep', 4, 'Disparity block size in x-Direction')
+
 tf.flags.DEFINE_string('experiment_name', str(int(time.time())), 'Name of the sub-directory to store results in')
 tf.flags.DEFINE_boolean('plot', False, 'Plot the results on screen')
 
